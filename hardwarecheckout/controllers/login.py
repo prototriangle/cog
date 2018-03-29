@@ -33,7 +33,8 @@ def oauth_callback():
         flash('Authentication failed.')
         return redirect('/inventory')
     if User.query.filter_by(email=email).count() == 0:
-        user = User(email, False)
+        admin = email in config.ADMINS
+        user = User(email, admin)
         db.session.add(user)
         db.session.commit()
 

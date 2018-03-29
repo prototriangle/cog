@@ -15,6 +15,11 @@ SECRET = os.environ['SECRET']
 # OAuth Credentials
 OAUTH_CREDENTIALS = {'id': os.environ['OAUTH_ID'], 'secret': os.environ['OAUTH_SECRET']}
 
+# Whitelist for admins
+ADMINS = []
+with open('admins.txt', 'r') as admins_file:
+    ADMINS = [line.strip() for line in admins_file.readlines()]
+
 ### The following variables may all be set using environment
 ### variables of the same name. The environment variable will
 ### take precedence over the value shown here. This is to allow
