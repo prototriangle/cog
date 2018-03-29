@@ -32,7 +32,7 @@ def get_requests():
         RequestStatus = RequestStatus,
         lottery_items = InventoryEntry.query.filter_by(item_type=ItemType.LOTTERY).all(),
         user=user)
-        
+
 @app.route('/request/submit', methods=['POST'])
 @requires_auth()
 def request_submit():
@@ -40,14 +40,14 @@ def request_submit():
     if not (user.location and user.phone):
         return jsonify(
             success=False,
-            message="""Please fill out your <a href='/user'>user info</a> before 
+            message="""Please fill out your <a href='/user'>user info</a> before
                 requesting items!"""
         )
     proposal = request.form.get('proposal', '')
     requested_quantity = int(request.form.get('quantity', 1))
 
     if app.config['LOTTERY_CHAR_LIMIT']:
-        if len(proposal) > app.config['LOTTERY_CHAR_LIMIT']: 
+        if len(proposal) > app.config['LOTTERY_CHAR_LIMIT']:
             proposal = proposal[:app.config['LOTTERY_CHAR_LIMIT']]
 
     entry = InventoryEntry.query.get(request.form['item_id'])
@@ -107,20 +107,20 @@ def request_submit():
     db.session.commit()
     return jsonify(
         success=True,
-    ) 
+    )
 
 @app.route('/request/<int:id>/cancel', methods=['POST'])
 @requires_auth()
 def request_cancel(id):
     """Cancel request, returns status
     Non-admins can only cancel own request, returns 403 if attempted"""
-    r = Request.query.get(id) 
+    r = Request.query.get(id)
     if user.is_admin or r.user_id == user.id:
         r.status = RequestStatus.CANCELLED
         db.session.commit()
         return jsonify(
             success=True,
-        ) 
+        )
     else:
         return jsonify(
             success=False,
@@ -136,7 +136,7 @@ def request_update(id, status):
     r = Request.query.get(id)
     r.status = status
     db.session.commit()
-    return True 
+    return True
 
 @app.route('/request/<int:id>/approve', methods=['POST'])
 @requires_admin()
@@ -209,17 +209,17 @@ def authenticate_admin_conection():
     if admin and False otherwise
     """
     if 'jwt' in request.cookies:
-        quill_id = verify_token(request.cookies['jwt'])
-        if not quill_id:
-            return False 
-        user = User.query.filter_by(quill_id=quill_id).first()
+        email = verify_token(request.cookies['jwt'])
+        if not email:
+            return False
+        user = User.query.filter_by(email=email).first()
 
         if user == None or not user.is_admin:
-            return False 
+            return False
 
         return True
-    else: 
-        return False 
+    else:
+        return False
 
 @socketio.on('connect', namespace='/user')
 def authenticate_user_conection():
@@ -227,20 +227,20 @@ def authenticate_user_conection():
     if logged in and False otherwise
     """
     if 'jwt' in request.cookies:
-        quill_id = verify_token(request.cookies['jwt'])
-        if not quill_id:
-            return False 
-        user = User.query.filter_by(quill_id=quill_id).first()
+        email = verify_token(request.cookies['jwt'])
+        if not email:
+            return False
+        user = User.query.filter_by(email=email).first()
 
         if user == None:
-            return False 
+            return False
 
         socket = Socket(request.sid, user)
         db.session.add(socket)
         db.session.commit()
         return True
     else:
-        return False 
+        return False
 
 @socketio.on('disconnect', namespace='/user')
 def user_disconnect():
@@ -259,7 +259,7 @@ def on_request_update(mapper, connection, target):
 
 def request_change_handler(target):
     """Handler that sends updated HTML for rendering requests"""
-    user = target.user  
+    user = target.user
     sockets = Socket.query.filter_by(user=user).all()
 
     requests = Request.query.filter(Request.user == user, Request.status.in_(

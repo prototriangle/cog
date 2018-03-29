@@ -17,10 +17,13 @@ def verify_token(token):
     try:
         return jws.verify(token, SECRET, algorithms=['HS256'])
     except JWSError:
-        return None 
+        return None
 
-def safe_redirect(endpoint, request): 
-    if request.method == 'POST': 
+def generate_auth_token(email):
+    return jws.sign(email, SECRET, algorithm='HS256')
+
+def safe_redirect(endpoint, request):
+    if request.method == 'POST':
         return jsonify(
             success=False,
             message="Redirecting...",
@@ -33,11 +36,11 @@ def requires_auth():
         @wraps(f)
         def decorated(*args, **kwargs):
             if 'jwt' in request.cookies:
-                quill_id = verify_token(request.cookies['jwt'])
-                if not quill_id:
+                email = verify_token(request.cookies['jwt'])
+                if not email:
                     return safe_redirect('login_page', request)
-                user = User.query.filter_by(quill_id=quill_id).first()
-         
+                user = User.query.filter_by(email=email).first()
+
                 # if no user found for auth token, log them out (clears token)
                 if user == None:
                     return safe_redirect('logout', request)
@@ -55,12 +58,13 @@ def auth_optional():
         @wraps(f)
         def decorated(*args, **kwargs):
             if 'jwt' in request.cookies:
-                quill_id = verify_token(request.cookies['jwt'])
-                if not quill_id:
-                    f.__globals__['user'] = None 
+                email = verify_token(request.cookies['jwt'])
+                print("Email: {}".format(email))
+                if not email:
+                    f.__globals__['user'] = None
                     return f(*args, **kwargs)
 
-                user = User.query.filter_by(quill_id=quill_id).first()
+                user = User.query.filter_by(email=email).first()
 
                 # if no user found for auth token, log them out (clears token)
                 if user == None:
@@ -69,7 +73,7 @@ def auth_optional():
                 f.__globals__['user'] = user
                 return f(*args, **kwargs)
             else:
-                f.__globals__['user'] = None 
+                f.__globals__['user'] = None
                 return f(*args, **kwargs)
 
         return decorated
@@ -80,10 +84,10 @@ def requires_admin():
         @wraps(f)
         def decorated(*args, **kwargs):
             if 'jwt' in request.cookies:
-                quill_id = verify_token(request.cookies['jwt'])
-                if not quill_id:
+                email = verify_token(request.cookies['jwt'])
+                if not email:
                     return safe_redirect('login_page', request)
-                user = User.query.filter_by(quill_id=quill_id).first()
+                user = User.query.filter_by(email=email).first()
 
                 # if no user found for auth token, log them out (clears token)
                 if user == None:

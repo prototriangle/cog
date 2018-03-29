@@ -1,13 +1,15 @@
 from hardwarecheckout import app
 from hardwarecheckout import config
-from hardwarecheckout.models.user import * 
-from hardwarecheckout.utils import verify_token
+from hardwarecheckout.models.user import *
+from hardwarecheckout.utils import verify_token, generate_auth_token
 import requests
 import datetime
 import json
 from urlparse import urljoin
 from hardwarecheckout.forms.login_form import LoginForm
+from mlh_oauth import MLHSignIn
 from flask import (
+    flash,
     redirect,
     render_template,
     request,
@@ -16,49 +18,32 @@ from flask import (
 
 @app.route('/login')
 def login_page():
-    """If not logged in render login page, otherwise redirect to inventory"""
+    mlh = MLHSignIn()
+    return mlh.authorize()
+
+@app.route('/callback/mlh')
+def oauth_callback():
     if 'jwt' in request.cookies:
-        try:
-            decode_token(request.cookies['jwt'])
+        token = verify_token(request.cookies['jwt'])
+        if token is not None:
             return redirect('/inventory')
-        except Exception as e:
-            pass
-        
-    return render_template('pages/login.html')
+    mlh = MLHSignIn()
+    id_, email = mlh.callback()
+    if id_ is None:
+        flash('Authentication failed.')
+        return redirect('/inventory')
+    if User.query.filter_by(email=email).count() == 0:
+        user = User(email, False)
+        db.session.add(user)
+        db.session.commit()
 
-@app.route('/login', methods=['POST'])
-def login_handler():
-    """Log user in"""
-    form = LoginForm(request.form)
-    if form.validate():
-        url = urljoin(config.QUILL_URL, '/auth/login')
-        r = requests.post(url, data={'email':request.form['email'], 'password':request.form['password']})
-        try: 
-            r = json.loads(r.text)
-        except ValueError as e:
-            return render_template('pages/login.html', error=[str(e)])
-        
-        if 'message' in r:
-            return render_template('pages/login.html', error=[r['message']])
+    # generate token since we cut out quill
+    token = generate_auth_token(email)
 
-        quill_id = verify_token(r['token'])
-        if not quill_id:
-            return render_template('pages/login.html', error=['Invalid token returned by registration'])
-        
-        if User.query.filter_by(quill_id=quill_id).count() == 0: 
-            user = User(quill_id, request.form['email'], r['user']['admin'])
-            db.session.add(user)
-            db.session.commit()
+    response = app.make_response(redirect('/inventory'))
+    response.set_cookie('jwt', token.encode('utf-8'))
 
-        response = app.make_response(redirect('/inventory'))
-        response.set_cookie('jwt', r['token'])
-        return response
-    
-    errors = []
-    for field, error in form.errors.items():
-        errors.append(field + ": " + "\n".join(error) + "\n")
-
-    return render_template('pages/login.html', error=errors)
+    return response
 
 @app.route('/logout')
 def logout():

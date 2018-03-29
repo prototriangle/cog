@@ -1,22 +1,22 @@
 import os
 
 TEST_DB="sqlite:///test_db"
-os.environ['DATABASE_URL'] = TEST_DB # sets DB URL for this process 
+os.environ['DATABASE_URL'] = TEST_DB # sets DB URL for this process
 
-import hardwarecheckout 
+import hardwarecheckout
 from hardwarecheckout.config import SECRET
 import unittest
 from jose import jws
 import tempfile
 import random
 import string
-from utils import * 
+from utils import *
 
 from hardwarecheckout.models import db
 from hardwarecheckout.models.user import User
 from hardwarecheckout.models.inventory_entry import InventoryEntry
-from hardwarecheckout.models.inventory_entry import ItemType 
-from hardwarecheckout.models.request import Request 
+from hardwarecheckout.models.inventory_entry import ItemType
+from hardwarecheckout.models.request import Request
 from hardwarecheckout.models.request import RequestStatus
 from hardwarecheckout.models.request_item import RequestItem
 from flask import url_for, json
@@ -32,7 +32,7 @@ def app():
         db.create_all()
         db.app = hardwarecheckout.app
         db.init_app(hardwarecheckout.app)
-        ctx = hardwarecheckout.app.test_request_context() 
+        ctx = hardwarecheckout.app.test_request_context()
         ctx.push()
         yield app
         ctx.pop()
@@ -41,12 +41,12 @@ def app():
 
 @pytest.fixture
 def user(app):
-    quill_id = ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(10))
-    token = jws.sign(quill_id, SECRET, algorithm='HS256')
-    user = User(quill_id, 'alyssap@hacker.org', False)
+    email = 'alyssap@hacker.org'
+    token = jws.sign(email, SECRET, algorithm='HS256')
+    user = User(email, False)
     db.session.add(user)
     db.session.commit()
-    app.set_cookie('localhost:8000', 'jwt', token) 
+    app.set_cookie('localhost:8000', 'jwt', token)
 
     return user
 
@@ -58,8 +58,8 @@ def admin(app, user):
 
 @pytest.fixture
 def item(app):
-    item = InventoryEntry('Item', 'Wow lick my socks', 
-        'http://test.co', 'Item', [], '', 3)        
+    item = InventoryEntry('Item', 'Wow lick my socks',
+        'http://test.co', 'Item', [], '', 3)
     db.session.add(item)
     db.session.commit()
     return item
@@ -75,30 +75,6 @@ def test_home(app):
         assert len(context['checkout_items']) == 0
         assert len(context['free_items']) == 0
 
-def test_quill_login(app):
-    with captured_templates(hardwarecheckout.app) as templates:
-        rv = quill_login(app, 'admin@example.com', 'party')
-        assert rv.status_code == 200
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert template.name == 'pages/inventory.html'
-
-    with captured_templates(hardwarecheckout.app) as templates:
-       rv = quill_login(app, 'admin@example.com', 'prty')
-       assert rv.status_code == 200
-       assert len(templates) == 1
-       template, context = templates[0]
-       assert template.name == 'pages/login.html'
-       assert "That's not the right password." in context['error']
-
-    with captured_templates(hardwarecheckout.app) as templates:
-       rv = quill_login(app, 'admin@example.co', 'party')
-       assert rv.status_code == 200
-       assert len(templates) == 1
-       template, context = templates[0]
-       assert template.name == 'pages/login.html'
-       assert "We couldn't find you!" in context['error']
-
 def test_request_item(app, user, item):
     update_user(app)
 
@@ -107,16 +83,16 @@ def test_request_item(app, user, item):
     assert response['success'] == False
     rv = request_item(app, 1)
     response = json.loads(rv.data)
-    assert response['success'] == True 
+    assert response['success'] == True
 
 def test_update_user(app, user):
     rv = update_user(app)
     response = json.loads(rv.data)
-    assert response['success'] == True 
+    assert response['success'] == True
 
 def test_add_delete_item(app, admin):
-    rv = add_item(app) 
-    assert json.loads(rv.data)['success'] == True 
+    rv = add_item(app)
+    assert json.loads(rv.data)['success'] == True
 
     rv = app.get('/inventory/delete/1')
     # TODO: add back check
