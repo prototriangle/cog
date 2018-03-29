@@ -61,3 +61,4 @@ wrapt==1.10.11
 WTForms==2.0
 WTForms-Alchemy==0.15.0
 WTForms-Components==0.10.3
+rauth==0.7.0

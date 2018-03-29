@@ -39,8 +39,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 set_conf_str(app, 'HACKATHON_NAME')
 app.config['APP_NAME'] = app.config['HACKATHON_NAME'] + ' Hardware Checkout'
-app.config['QUILL_URL'] = config.QUILL_URL 
-app.config['QUILL_URL_READABLE'] = urlsplit(app.config['QUILL_URL']).netloc
 
 # Debug
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -79,9 +77,9 @@ socketio.init_app(app)
 import hardwarecheckout.controllers # registers controllers
 
 # delete stale sockets from previous open sessions
-try: 
+try:
     Socket.query.delete()
     db.session.commit()
-except: 
+except:
     # exception if DB not yet initialized
     pass
