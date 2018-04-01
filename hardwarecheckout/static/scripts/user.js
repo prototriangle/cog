@@ -26,6 +26,9 @@ $(document).ready(function() {
     });
 
     $(':button').on('click', function() {
+        if ($('#cvupload').get(0).files.length < 1) {
+            return;
+        }
         $.ajax({
             url: 'cvupload',
             type: 'POST',
