@@ -21,17 +21,24 @@
 
 <h3> Info </h3>
 <form method="post" class="ui form">
-    <div class="four fields">
+    <div class="five fields">
         <div class="three wide field">
+            <label for="name">Full name *</label>
             <input type="text" name="name" placeholder="Name" value="{{ target.name }}">
         </div>
         <div class="three wide field">
+            <label for="location">Table number *</label>
             <input type="text" name="location" placeholder="Table Number" value="{{ target.location }}">
         </div>
         <div class="five wide field">
+            <label for="phone">Phone number *</label>
             <input type="text" name="phone" placeholder="Phone Number" value="{{ target.phone }}">
         </div>
-        <div class="four wide field">
+        <div class="three wide field">
+            <label for="cv">Upload your CV</label>
+            <input type="file" name="cv">
+        </div>
+        <div class="one wide field">
             <button class="ui primary update-user button" data-id="{{ target.id }}" type="submit">
                Update 
             </button>

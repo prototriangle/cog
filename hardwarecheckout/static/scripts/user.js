@@ -25,6 +25,31 @@ $(document).ready(function() {
         }
     });
 
+    $(':button').on('click', function() {
+        $.ajax({
+            url: 'cvupload',
+            type: 'POST',
+
+            data: new FormData($('form')[0]),
+
+            cache: false,
+            contentType: false,
+            processData:false,
+
+            xhr: function() {
+                var myXhr = $.ajaxSettings.xhr();
+                if (myXhr.upload) {
+                    myXhr.upload.addEventListener('progress', function(e) {
+                        if (e.lengthComputable) {
+                            console.log(e.loaded + '/' + e.total);
+                        }
+                    }, false);
+                }
+                return myXhr;
+            }
+        });
+    });
+
     // enables items_list actions
     $('.item-action').api({
         method: 'POST',

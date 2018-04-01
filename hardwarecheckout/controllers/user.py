@@ -9,13 +9,25 @@ from hardwarecheckout.models import db
 
 from hardwarecheckout.forms.user_update_form import UserUpdateForm
 
+from werkzeug.utils import secure_filename
+
 from flask import (
     jsonify,
     send_from_directory,
     request,
     redirect,
-    render_template
+    render_template,
 )
+
+UPLOAD_FOLDER = "cv"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# limit max upload size to 10MB
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'txt']
+
+def allowed_filename(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/user')
 @requires_auth()
@@ -42,6 +54,34 @@ def user_items(id):
             RequestStatus = RequestStatus,
             isme = is_me,
             items = target.items)
+
+@app.route('/cvupload', methods=['POST'])
+@requires_auth()
+def cvupload():
+    if 'cv' not in request.files:
+        return jsonify(
+            success=False,
+            reason="No file part"
+        )
+
+    file_ = request.files['cv']
+
+    if file_.filename == '':
+        return jsonify(
+            success=False,
+            reason="No file provided"
+        )
+
+    if file_ and allowed_filename(file_.filename):
+        filename = secure_filename(str(user.id) + file_.filename)
+        file_.save(os.path.join(UPLOAD_FOLDER, filename))
+        return jsonify(
+            success=True
+        )
+    return jsonify(
+        success=False,
+        reason="Function fell out"
+    )
 
 @app.route('/user/<int:id>/update', methods=['POST'])
 @requires_auth()
