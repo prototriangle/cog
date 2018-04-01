@@ -10,7 +10,7 @@
 
 {% block panel %}
 
-{{ display_item(item, requestable=False) }}
+{{ display_item(item, counts, requestable=False) }}
 
 <div>
     <button class="ui red button" onclick="$('.delete-conf').modal('show');">

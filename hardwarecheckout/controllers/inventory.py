@@ -88,6 +88,11 @@ def inventory():
 def inventory_display(id):
     """Render information for admins about an item entry and allow 
     them to edit it."""
+    counts = db.session.query(Item.entry_id, func.count(Item.entry_id))\
+            .group_by(Item.entry_id)\
+            .filter_by(user_id = None)\
+            .all()
+    counts = {id_: count for (id_, count) in counts}
     entry = InventoryEntry.query.get(id)
     return render_template('pages/item.html', item = entry, user=user,
             requests = Request.query.filter(
@@ -95,6 +100,7 @@ def inventory_display(id):
                 .join(InventoryEntry.requests).filter(InventoryEntry.id == entry.id),
             RequestStatus = RequestStatus,
             is_lottery = (entry.item_type == ItemType.LOTTERY),
+            counts = counts,
             users = User.query.filter(User.items.any(entry = entry)))
 
 @app.route('/inventory/subitem/delete/<int:id>', methods=['POST'])
