@@ -24,11 +24,32 @@ $(document).ready(function() {
           flash: 'Info updated!'
         }
     });
+    $(':file').on('change', function() {
+        var file = this.files[0];
+        if (file.size > 10 * 1024 * 1024) {
+            alert('max upload size is 10MB');
+            this.value = "";
+        }
+    });
 
     $(':button').on('click', function() {
+        var $error = $('form').find('.message').first();
+        $error.hide()
         if ($('#cvupload').get(0).files.length < 1) {
             return;
         }
+        if ($('#cvupload').get(0).files[0].size > 10 * 1024 * 1024) {
+            $('.error.message').html('File too large!');
+            $('.error.message').show();
+            return;
+        }
+        $('#sponsor-agreement').modal('show');
+        $('#sponsor-agreement').modal({
+            onApprove: onDataAgree
+        });
+    });
+
+    function onDataAgree() {
         $.ajax({
             url: 'cvupload',
             type: 'POST',
@@ -51,7 +72,7 @@ $(document).ready(function() {
                 return myXhr;
             }
         });
-    });
+    }
 
     // enables items_list actions
     $('.item-action').api({
