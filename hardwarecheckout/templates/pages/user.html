@@ -24,7 +24,7 @@
     <div class="five fields">
         <div class="three wide field">
             <label for="name">Full name *</label>
-            <input type="text" name="name" placeholder="Name" value="{{ target.name }}">
+            <input type="text" name="name" placeholder="Full Name" value="{{ target.name }}">
         </div>
         <div class="three wide field">
             <label for="location">Table number *</label>
@@ -36,7 +36,7 @@
         </div>
         <div class="three wide field">
         {% if not target.cv %}
-            <label id="cvlabel" for="cv">Upload your CV</label>
+            <label id="cvlabel" for="cv">Upload your CV (optional, recommended for sponsor interviews)</label>
         {% else %}
             <label id="cvlabel" for="cv">CV uploaded</label>
         {% endif %}
