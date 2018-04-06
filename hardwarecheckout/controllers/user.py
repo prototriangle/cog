@@ -89,7 +89,7 @@ def cvupload():
         )
     return jsonify(
         success=False,
-        reason="Disallowed file type"
+        reason="Disallowed file type, allowed types are {}".format(", ".join(ALLOWED_EXTENSIONS))
     )
 
 @app.route('/user/<int:id>/update', methods=['POST'])

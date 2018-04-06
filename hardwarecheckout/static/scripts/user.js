@@ -34,7 +34,7 @@ $(document).ready(function() {
 
     $(':button').on('click', function() {
         var $error = $('form').find('.message').first();
-        $error.hide()
+        $error.hide();
         if ($('#cvupload').get(0).files.length < 1) {
             return;
         }
@@ -50,7 +50,6 @@ $(document).ready(function() {
     });
 
     function onDataAgree() {
-        $('#cvlabel')[0].innerHTML = "CV Uploaded";
         $.ajax({
             url: 'cvupload',
             type: 'POST',
@@ -60,6 +59,16 @@ $(document).ready(function() {
             cache: false,
             contentType: false,
             processData:false,
+
+            complete: function(jqXHR, textStatus) {
+                response = JSON.parse(jqXHR.responseText);
+                if (!response['success']) {
+                    $('.error.message').html(response['reason']);
+                    $('.error.message').show();
+                } else {
+                    $('#cvlabel')[0].innerHTML = "CV Uploaded";
+                }
+            },
 
             xhr: function() {
                 var myXhr = $.ajaxSettings.xhr();
