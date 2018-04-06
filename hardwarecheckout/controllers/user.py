@@ -9,13 +9,25 @@ from hardwarecheckout.models import db
 
 from hardwarecheckout.forms.user_update_form import UserUpdateForm
 
+from werkzeug.utils import secure_filename
+
 from flask import (
     jsonify,
     send_from_directory,
     request,
     redirect,
-    render_template
+    render_template,
 )
+
+UPLOAD_FOLDER = "cv"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# limit max upload size to 10MB
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024
+ALLOWED_EXTENSIONS = ['pdf', 'doc', 'docx', 'txt']
+
+def allowed_filename(filename):
+    return '.' in filename and \
+            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/user')
 @requires_auth()
@@ -43,6 +55,43 @@ def user_items(id):
             isme = is_me,
             items = target.items)
 
+@app.route('/cvupload', methods=['POST'])
+@requires_auth()
+def cvupload():
+    if 'cv' not in request.files:
+        return jsonify(
+            success=False,
+            reason="No file part"
+        )
+
+    file_ = request.files['cv']
+
+    if file_.filename == '':
+        return jsonify(
+            success=False,
+            reason="No file provided"
+        )
+
+    if file_ and allowed_filename(file_.filename):
+        if user.cv is not None:
+            print(user.cv)
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, user.cv))
+            except:
+                print("Couldn't remove previous CV")
+        filename = secure_filename(str(user.id) + file_.filename)
+        file_.save(os.path.join(UPLOAD_FOLDER, filename))
+        user_to_change = User.query.get(user.id)
+        user_to_change.cv = filename
+        db.session.commit()
+        return jsonify(
+            success=True
+        )
+    return jsonify(
+        success=False,
+        reason="Disallowed file type, allowed types are {}".format(", ".join(ALLOWED_EXTENSIONS))
+    )
+
 @app.route('/user/<int:id>/update', methods=['POST'])
 @requires_auth()
 def user_update(id):
@@ -50,17 +99,17 @@ def user_update(id):
     if user.is_admin or user.id == id:
         user_to_change = User.query.get(id)
         form = UserUpdateForm(request.form)
-        if form.validate(): 
+        if form.validate():
             if form.location.data:
                 user_to_change.location = form.location.data
             if form.phone.data:
                 user_to_change.phone = form.phone.data.national_number
-            if form.name.data:  
+            if form.name.data:
                 user_to_change.name = form.name.data
             db.session.commit()
             return jsonify(
                 success=True
-            ) 
+            )
 
         error_msg = '\n'.join([key.title() + ': ' + ', '.join(value) for key, value in form.errors.items()])
 
