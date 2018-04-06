@@ -35,7 +35,11 @@
             <input type="text" name="phone" placeholder="Phone Number" value="{{ target.phone }}">
         </div>
         <div class="three wide field">
-            <label for="cv">Upload your CV</label>
+        {% if not target.cv %}
+            <label id="cvlabel" for="cv">Upload your CV</label>
+        {% else %}
+            <label id="cvlabel" for="cv">CV uploaded</label>
+        {% endif %}
             <input type="file" name="cv" id="cvupload">
         </div>
         <div class="one wide field">

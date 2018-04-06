@@ -50,6 +50,7 @@ $(document).ready(function() {
     });
 
     function onDataAgree() {
+        $('#cvlabel')[0].innerHTML = "CV Uploaded";
         $.ajax({
             url: 'cvupload',
             type: 'POST',

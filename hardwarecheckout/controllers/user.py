@@ -73,14 +73,23 @@ def cvupload():
         )
 
     if file_ and allowed_filename(file_.filename):
+        if user.cv is not None:
+            print(user.cv)
+            try:
+                os.remove(os.path.join(UPLOAD_FOLDER, user.cv))
+            except:
+                print("Couldn't remove previous CV")
         filename = secure_filename(str(user.id) + file_.filename)
         file_.save(os.path.join(UPLOAD_FOLDER, filename))
+        user_to_change = User.query.get(user.id)
+        user_to_change.cv = filename
+        db.session.commit()
         return jsonify(
             success=True
         )
     return jsonify(
         success=False,
-        reason="Function fell out"
+        reason="Disallowed file type"
     )
 
 @app.route('/user/<int:id>/update', methods=['POST'])
@@ -90,17 +99,17 @@ def user_update(id):
     if user.is_admin or user.id == id:
         user_to_change = User.query.get(id)
         form = UserUpdateForm(request.form)
-        if form.validate(): 
+        if form.validate():
             if form.location.data:
                 user_to_change.location = form.location.data
             if form.phone.data:
                 user_to_change.phone = form.phone.data.national_number
-            if form.name.data:  
+            if form.name.data:
                 user_to_change.name = form.name.data
             db.session.commit()
             return jsonify(
                 success=True
-            ) 
+            )
 
         error_msg = '\n'.join([key.title() + ': ' + ', '.join(value) for key, value in form.errors.items()])
 
