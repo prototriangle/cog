@@ -30,7 +30,7 @@ def add_item(app, quantity=5, lottery=True, checkout=True):
 def update_user(app):
     return app.post('/user/1/update', data=dict(
            location='A5',
-           phone='617-555-0123',
+           phone='07873492204',
            name='Alyssa'
        ), follow_redirects=True)
 
