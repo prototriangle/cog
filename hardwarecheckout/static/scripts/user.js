@@ -67,6 +67,12 @@ $(document).ready(function() {
                     $('.error.message').show();
                 } else {
                     $('#cvlabel')[0].innerHTML = "CV Uploaded";
+                    $modalcontent = $('#sponsormodalcontent');
+                    if ($modalcontent.children().length < 2) {
+                        $('<p>', {
+                            text: "You have already uploaded a CV, are you sure you want to replace it?"
+                        }).appendTo($modalcontent);
+                    }
                 }
             },
 
