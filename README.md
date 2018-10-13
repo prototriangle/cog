@@ -1,6 +1,6 @@
 # Cog
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/techx/cog)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/CreatEDHack/cog)
 
 Cog is a hardware checkout system for hackathons, originally written for use
 at HackMIT and MakeMIT.
