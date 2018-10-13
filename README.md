@@ -87,6 +87,8 @@ CSS when the Sass is changed, install [Sass](https://sass-lang.com/) and run
 *If you end up using Cog for your event, please take a moment to add yourself to our 
 [users list](https://github.com/techx/cog/wiki/Cog-Users)!*
 
+
+
 ## Development
 Interested in hacking on Cog? Check out the [development guide](DEVELOPMENT.md) 
 for some steps to get you started.
