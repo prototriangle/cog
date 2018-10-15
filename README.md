@@ -7,7 +7,7 @@ at HackMIT and MakeMIT.
 
 ![Cog](/media/cog.png?raw=true)
 
-## Features
+## Feature
 
 ### Inventory Management
 Add inventory items individually or in bulk from a spreadsheet, providing
