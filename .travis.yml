@@ -3,3 +3,8 @@ python:
     - "2.7"
 script:
     - python -m pytest tests/
+env:
+    - OAUTH_ID=dummyoauthid
+    - OAUTH_SECRET=dummyoauthsecret
+    - SECRET=dummyapplicationsecret
+    - DATABASE_URL=postgres://postgres:created@localhost/postgres
