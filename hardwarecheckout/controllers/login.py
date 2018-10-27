@@ -28,7 +28,9 @@ def oauth_callback():
         if token is not None:
             return redirect('/inventory')
     mlh = MLHSignIn()
-    id_, email = mlh.callback()
+    output = mlh.callback()
+    print(output)
+    id_, email = output
     if id_ is None:
         flash('Authentication failed.')
         return redirect('/inventory')
