@@ -28,6 +28,7 @@ class MLHSignIn(object):
 
     def callback(self):
         if 'code' not in request.args:
+            raise ValueError(str(request.args))
             return None, None, None
         oauth_session = self.service.get_auth_session(
             data={'code': request.args['code'],
