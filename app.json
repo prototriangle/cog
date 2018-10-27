@@ -1,7 +1,7 @@
 {
     "name": "Cog",
     "description": "A hackathon hardware check-out system by HackMIT",
-    "repository": "https://github.com/techx/cog",
+    "repository": "https://github.com/prototriangle/cog",
     "env": {
         "QUILL": {
             "description": "URL of Quill instance (for auth integration)"
