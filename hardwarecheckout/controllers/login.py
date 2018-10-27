@@ -29,7 +29,7 @@ def oauth_callback():
             return redirect('/inventory')
     mlh = MLHSignIn()
     output = mlh.callback()
-    print(output)
+    raise ValueError(str(output))
     id_, email = output
     if id_ is None:
         flash('Authentication failed.')
