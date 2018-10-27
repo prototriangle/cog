@@ -3,6 +3,12 @@
     "description": "A hackathon hardware check-out system by HackMIT",
     "repository": "https://github.com/prototriangle/cog",
     "env": {
+        "OAUTH_ID": {
+            "description": "MyMLH OAuth Application ID"
+        }, 
+        "OAUTH_SECRET": {
+            "description": "MyMLH OAuth Secret"
+        },
         "QUILL": {
             "description": "URL of Quill instance (for auth integration)"
         }, 
