@@ -1,6 +1,6 @@
 # Cog
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/CreatEDHack/cog)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/prototriangle/cog)
 
 Cog is a hardware checkout system for hackathons, originally written for use
 at HackMIT and MakeMIT.
@@ -38,7 +38,7 @@ an additional account.
 The easiest way to deploy Cog is to smash this Deploy to Heroku button right
 here:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/techx/cog)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/prototriangle/cog)
 
 If you're interested in deploying on other infrastructure, that should be
 doable as well. Cog is written in Python 2, and all dependencies can easily
