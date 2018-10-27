@@ -18,7 +18,7 @@ class MLHSignIn(object):
         )
 
     def get_callback_url(self):
-        return url_for("oauth_callback", _external=True)
+        return url_for("oauth_callback", _external=True, _scheme='https')
 
     def authorize(self):
         return redirect(self.service.get_authorize_url(
